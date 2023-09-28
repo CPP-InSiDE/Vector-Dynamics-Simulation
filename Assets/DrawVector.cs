@@ -4,40 +4,52 @@ using UnityEngine;
 
 public class DrawVector : MonoBehaviour
 {
-    [SerializeField] private float angleInDegrees;
-    [SerializeField] private float magnitude;
-
+    // PRIVATE VARIABLES
+    private DrawArrow _arrow;
+    private float _previousAngleInDegrees;
+    private float _previousMagnitude;
     private enum Direction { Positive, Negative };
-    [SerializeField] private Direction xDirection = Direction.Positive;
-    [SerializeField] private Direction yDirection = Direction.Positive;
+    private Direction _previousXDirection;
+    private Direction _previousYDirection;
+    
+    // SERIALIZABLE VARIABLES
+    [SerializeField] private float _angleInDegrees;
+    [SerializeField] private float _magnitude;
+    [SerializeField] private Direction _xDirection = Direction.Positive;
+    [SerializeField] private Direction _yDirection = Direction.Positive;
 
-    private float previousAngleInDegrees;
-    private float previousMagnitude;
-    private Direction previousXDirection;
-    private Direction previousYDirection;
+    // LIFECYCLE METHODS
+    void Start() {
+        _arrow = GetComponent<DrawArrow>();
+    }
 
     void Update() {
-        // if angle, magnitude have not changed, do not compute vector end point
-        if (
-            angleInDegrees == previousAngleInDegrees && 
-            magnitude == previousMagnitude &&
-            xDirection == previousXDirection &&
-            yDirection == previousYDirection
-        ) 
-        return;
+        if (IsStateUnChanged()) return;
+        _arrow._EndPoint = CalculateVectorEndPoint();
+        SaveState();
+    }
 
-        // calculate vector end point
-        float angleInRadians = angleInDegrees * (Mathf.PI / 180f);
+    // CLASS METHODS
+    bool IsStateUnChanged() {
+        return _angleInDegrees == _previousAngleInDegrees
+        && _magnitude == _previousMagnitude
+        && _xDirection == _previousXDirection
+        && _yDirection == _previousYDirection;
+    }
+
+    Vector3 CalculateVectorEndPoint() {
+        float angleInRadians = _angleInDegrees * (Mathf.PI / 180f);
         Vector3 vectorEndPoint = new Vector3 {
-            x = (xDirection == Direction.Positive ? 1 : -1) * magnitude * Mathf.Cos(angleInRadians),
-            y = (yDirection == Direction.Positive ? 1 : -1) * magnitude * Mathf.Sin(angleInRadians)
+            x = (_xDirection == Direction.Positive ? 1 : -1) * _magnitude * Mathf.Cos(angleInRadians),
+            y = (_yDirection == Direction.Positive ? 1 : -1) * _magnitude * Mathf.Sin(angleInRadians)
         };
-        GetComponent<DrawLine>().EndPoint = vectorEndPoint;
+        return vectorEndPoint;
+    }
 
-        // save angle and magnitude
-        previousAngleInDegrees = angleInDegrees;
-        previousMagnitude = magnitude;
-        previousXDirection = xDirection;
-        previousYDirection = yDirection;
+    void SaveState() {
+        _previousAngleInDegrees = _angleInDegrees;
+        _previousMagnitude = _magnitude;
+        _previousXDirection = _xDirection;
+        _previousYDirection = _yDirection;
     }
 }

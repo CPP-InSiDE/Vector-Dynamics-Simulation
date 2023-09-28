@@ -6,71 +6,95 @@ using UnityEngine;
 
 public class DrawResultantVector : MonoBehaviour
 {
-    [SerializeField] private DrawLine vector1Line;
-    [SerializeField] private DrawLine vector2Line;
-
+    // PRIVATE VARIABLES
+    private DrawArrow _arrow;
+    private Vector3 _vector1EndPoint;
+    private Vector3 _vector2EndPoint;
+    private float _vectorMagnitudeAddition;
+    private Vector3 _vectorAddition;
+    private Vector3 _vectorSubtraction;
+    private Vector3 _vectorCrossProduct;
+    private float _vectorDotProduct;
     private enum Operation { Addition, Subtraction, CrossProduct };
-    [SerializeField] private Operation selectedOperation = Operation.Addition;
+    private Operation _previousSelectedOperation;
+    private Vector3 _previousVector1EndPoint;
+    private Vector3 _previousVector2EndPoint;
 
-    [SerializeField] private bool reverseOperands = false;
+    // SERIALIZABLE VARIABLES
+    [SerializeField] private DrawArrow _vector1Line;
+    [SerializeField] private DrawArrow _vector2Line;
+    [SerializeField] private Operation _selectedOperation = Operation.Addition;
+    [SerializeField] private bool _reverseOperands = false;
 
-    private Vector3 previousVector1EndPoint;
-    private Vector3 previousVector2EndPoint;
-    private Operation previousSelectedOperation;
-    
-    void Update() {
-        // get vector 1 and 2 end points (or reverse them if reverse operands is set to true)
-        Vector3 vector1EndPoint = !reverseOperands ? vector1Line.EndPoint : vector2Line.EndPoint;
-        Vector3 vector2EndPoint = !reverseOperands ? vector2Line.EndPoint : vector1Line.EndPoint;
-
-        // if previous vector endpoints and selected operation are unchanged, do not compute resultant vector and dot product
-        if (
-            vector1EndPoint == previousVector1EndPoint && 
-            vector2EndPoint == previousVector2EndPoint && 
-            selectedOperation == previousSelectedOperation
-        ) 
-        return;
-
-        // vector calculations
-        float vectorMagnitudeAddition = vector1EndPoint.magnitude + vector2EndPoint.magnitude;
-        Vector3 vectorAddition = vector1EndPoint + vector2EndPoint;
-        Vector3 vectorSubtraction = vector1EndPoint - vector2EndPoint;
-        Vector3 vectorCrossProduct = Vector3.Cross(vector1EndPoint, vector2EndPoint);
-        float vectorDotProduct = Vector3.Dot(vector1EndPoint, vector2EndPoint);
-
-        // print to console
-        ClearLog();
-        print((!reverseOperands ? "|V1| + |V2|" : "|V2| + |V1|") + ": " + vectorMagnitudeAddition);
-        print((!reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + vectorAddition);
-        print((!reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + vectorSubtraction);
-        print((!reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + vectorCrossProduct);
-        print((!reverseOperands ? "V1 . V2" : "V2 . V1") + ": " + vectorDotProduct);
-
-        // draw resultant vector based on selected operation
-        Vector3 resultantVectorEndPoint = new Vector3();
-        switch(selectedOperation) {
-            case Operation.Addition:
-                resultantVectorEndPoint = vectorAddition;
-                break;
-            case Operation.Subtraction:
-                resultantVectorEndPoint = vectorSubtraction;
-                break;
-            case Operation.CrossProduct:
-                resultantVectorEndPoint = vectorCrossProduct;
-                break;
-        }
-        GetComponent<DrawLine>().EndPoint = resultantVectorEndPoint;
-        
-        // save vector 1 & 2 endpoints and selected operation
-        previousVector1EndPoint = vector1EndPoint;
-        previousVector2EndPoint = vector2EndPoint;
-        previousSelectedOperation = selectedOperation;
+    // LIFECYCLE METHODS
+    void Start() {
+        _arrow = GetComponent<DrawArrow>();
     }
 
-    public static void ClearLog() {
-        var assembly = Assembly.GetAssembly(typeof(UnityEditor.ActiveEditorTracker));
-        var type = assembly.GetType("UnityEditor.LogEntries");
-        var method = type.GetMethod("Clear");
+    void Update() {
+        ReverseVectorEndPoints();
+        if (IsStateUnChanged()) return;
+        PerformVectorArithmetic();
+        ClearLog();
+        PrintVectorArithmetic();
+        _arrow._EndPoint = CalculateResultantVectorEndPoint();
+        SaveState();
+    }
+
+    // CLASS METHODS
+    void ReverseVectorEndPoints() {
+        _vector1EndPoint = !_reverseOperands ? _vector1Line._EndPoint : _vector2Line._EndPoint;
+        _vector2EndPoint = !_reverseOperands ? _vector2Line._EndPoint : _vector1Line._EndPoint;
+    }
+
+    bool IsStateUnChanged() {
+        return _vector1EndPoint == _previousVector1EndPoint
+        && _vector2EndPoint == _previousVector2EndPoint
+        && _selectedOperation == _previousSelectedOperation;
+    }
+
+    void PerformVectorArithmetic() {
+        _vectorMagnitudeAddition = _vector1EndPoint.magnitude + _vector2EndPoint.magnitude;
+        _vectorAddition = _vector1EndPoint + _vector2EndPoint;
+        _vectorSubtraction = _vector1EndPoint - _vector2EndPoint;
+        _vectorCrossProduct = Vector3.Cross(_vector1EndPoint, _vector2EndPoint);
+        _vectorDotProduct = Vector3.Dot(_vector1EndPoint, _vector2EndPoint);
+    }
+
+    public void ClearLog() {
+        Assembly assembly = Assembly.GetAssembly(typeof(UnityEditor.ActiveEditorTracker));
+        System.Type type = assembly.GetType("UnityEditor.LogEntries");
+        MethodInfo method = type.GetMethod("Clear");
         method.Invoke(new object(), null);
+    }
+
+    void PrintVectorArithmetic() {
+        print((!_reverseOperands ? "|V1| + |V2|" : "|V2| + |V1|") + ": " + _vectorMagnitudeAddition);
+        print((!_reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + _vectorAddition);
+        print((!_reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + _vectorSubtraction);
+        print((!_reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + _vectorCrossProduct);
+        print((!_reverseOperands ? "V1 . V2" : "V2 . V1") + ": " + _vectorDotProduct);
+    }
+
+    Vector3 CalculateResultantVectorEndPoint() {
+        Vector3 resultantVectorEndPoint = new Vector3();
+        switch(_selectedOperation) {
+            case Operation.Addition:
+                resultantVectorEndPoint = _vectorAddition;
+                break;
+            case Operation.Subtraction:
+                resultantVectorEndPoint = _vectorSubtraction;
+                break;
+            case Operation.CrossProduct:
+                resultantVectorEndPoint = _vectorCrossProduct;
+                break;
+        }
+        return resultantVectorEndPoint;
+    }
+
+    void SaveState() {
+        _previousVector1EndPoint = _vector1EndPoint;
+        _previousVector2EndPoint = _vector2EndPoint;
+        _previousSelectedOperation = _selectedOperation;
     }
 }
