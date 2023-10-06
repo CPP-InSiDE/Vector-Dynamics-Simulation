@@ -20,9 +20,6 @@ public class DrawVector : MonoBehaviour
     [SerializeField] private Direction _xDirection = Direction.Positive;
     [SerializeField] private Direction _yDirection = Direction.Positive;
 
-    [SerializeField] private TMPro.TMP_InputField _AngleInDegreesInput;
-    [SerializeField] private TMPro.TMP_InputField _MagnitudeInput;
-
     // LIFECYCLE METHODS
     void Start() {
         _arrow = GetComponent<DrawArrow>();
