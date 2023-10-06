@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class DrawVector : MonoBehaviour
 {
@@ -8,15 +9,19 @@ public class DrawVector : MonoBehaviour
     private DrawArrow _arrow;
     private float _previousAngleInDegrees;
     private float _previousMagnitude;
-    private enum Direction { Positive, Negative };
     private Direction _previousXDirection;
     private Direction _previousYDirection;
+
+    public enum Direction { Positive, Negative };
     
     // SERIALIZABLE VARIABLES
     [SerializeField] private float _angleInDegrees;
     [SerializeField] private float _magnitude;
     [SerializeField] private Direction _xDirection = Direction.Positive;
     [SerializeField] private Direction _yDirection = Direction.Positive;
+
+    [SerializeField] private TMPro.TMP_InputField _AngleInDegreesInput;
+    [SerializeField] private TMPro.TMP_InputField _MagnitudeInput;
 
     // LIFECYCLE METHODS
     void Start() {
@@ -26,6 +31,7 @@ public class DrawVector : MonoBehaviour
     void Update() {
         if (IsStateUnChanged()) return;
         _arrow._EndPoint = CalculateVectorEndPoint();
+        // _arrow._ScaledEndPoint = GameManager._Instance.ScaleVector(_arrow._EndPoint);
         SaveState();
     }
 
@@ -51,5 +57,35 @@ public class DrawVector : MonoBehaviour
         _previousMagnitude = _magnitude;
         _previousXDirection = _xDirection;
         _previousYDirection = _yDirection;
+    }
+
+    public void GrabFromAngleInputField(string angle) {
+        _angleInDegrees = float.Parse(angle);
+    }
+
+    public void GrabFromMagnitudeInputField(string magnitude) {
+        _magnitude = float.Parse(magnitude);
+    }
+
+    public void HandleXDirectionDropdownInputData(int value) {
+        switch (value) {
+            case 0:
+                _xDirection = Direction.Positive;
+                break;
+            case 1:
+                _xDirection = Direction.Negative;
+                break;
+        }
+    }
+
+    public void HandleYDirectionDropdownInputData(int value) {
+        switch (value) {
+            case 0:
+                _yDirection = Direction.Positive;
+                break;
+            case 1:
+                _yDirection = Direction.Negative;
+                break;
+        }
     }
 }
