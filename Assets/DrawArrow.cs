@@ -36,6 +36,7 @@ public class DrawArrow : MonoBehaviour
         if (IsStateUnChanged()) return;
         DrawArrowBody();
         DrawArrowHead();
+        MakeTransparentBasedOnDistance();
         SaveState();
     }
 
@@ -54,7 +55,7 @@ public class DrawArrow : MonoBehaviour
     }
 
     void InitializeArrowHead() {
-        _arrowHead = new GameObject("ArrowHead");
+        _arrowHead = new GameObject(gameObject.name + " arrow head");
         _arrowHeadRenderer = _arrowHead.AddComponent<LineRenderer>();
         _arrowHeadRenderer.material = _arrowBodyRenderer.material;
         _arrowHeadRenderer.startWidth = _arrowHeadThickness;
@@ -94,19 +95,28 @@ public class DrawArrow : MonoBehaviour
         _arrowHeadRenderer.SetPositions(arrowHeadPositions);
     }
 
+    void MakeTransparentBasedOnDistance() {
+        _Color = Vector3.Distance(_StartPoint, _EndPoint) < 0.1f ? new Color { a = 0 } : _color;
+    }
+
     void DrawLabel() {
         Vector3 labelPositionInWorldSpace = GetPointAlongSlopeFromEndPointUsingDistance(0.25f);
         Vector3 labelPositionOnScreen = Camera.main.WorldToScreenPoint(labelPositionInWorldSpace);
-        Vector2 textSize = GUI.skin.label.CalcSize(new GUIContent(_label));
-        GUI.contentColor = _color;
+        string labelWithEndPointCoordinates = _label + (gameObject.name.Contains("axis") ? "" : (" " + _EndPoint));
+        Vector2 labelTextSize = GUI.skin.label.CalcSize(new GUIContent(_label));
+        Vector2 labelWithEndPointCoordinatesTextSize = GUI.skin.label.CalcSize(new GUIContent(labelWithEndPointCoordinates));
         GUI.Label(
             new Rect(
-                labelPositionOnScreen.x - textSize.x / 2, 
-                Screen.height - labelPositionOnScreen.y - textSize.y / 2, 
-                textSize.x, 
-                textSize.y
+                labelPositionOnScreen.x - labelTextSize.x / 2, 
+                Screen.height - labelPositionOnScreen.y - labelTextSize.y / 2, 
+                labelWithEndPointCoordinatesTextSize.x, 
+                labelWithEndPointCoordinatesTextSize.y
             ), 
-            _label
+            labelWithEndPointCoordinates,
+            new GUIStyle {
+                fontSize = 20,
+                normal = new GUIStyleState { textColor = _Color }
+            }
         );
     }
 
