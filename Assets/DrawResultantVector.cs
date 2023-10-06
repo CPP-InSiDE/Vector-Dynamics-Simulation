@@ -26,6 +26,15 @@ public class DrawResultantVector : MonoBehaviour
     [SerializeField] private Operation _selectedOperation = Operation.Addition;
     [SerializeField] private bool _reverseOperands = false;
 
+    // [SerializeField] private TMPro.TextMeshProUGUI _vector1CoordinatesText;
+    // [SerializeField] private TMPro.TextMeshProUGUI _vector2CoordinatesText;
+    // [SerializeField] private TMPro.TextMeshProUGUI _resultantVectorCoordinatesText;
+    [SerializeField] private TMPro.TextMeshProUGUI _vectorMagnitudeAdditionText;
+    [SerializeField] private TMPro.TextMeshProUGUI _vectorAdditionText;
+    [SerializeField] private TMPro.TextMeshProUGUI _vectorSubtractionText;
+    [SerializeField] private TMPro.TextMeshProUGUI _vectorCrossProductText;
+    [SerializeField] private TMPro.TextMeshProUGUI _vectorDotProductText;
+
     // LIFECYCLE METHODS
     void Start() {
         _arrow = GetComponent<DrawArrow>();
@@ -38,6 +47,8 @@ public class DrawResultantVector : MonoBehaviour
         ClearLog();
         PrintVectorArithmetic();
         _arrow._EndPoint = CalculateResultantVectorEndPoint();
+        // _arrow._ScaledEndPoint = GameManager._Instance.ScaleVector(_arrow._EndPoint);
+        HandleUIText();
         SaveState();
     }
 
@@ -96,5 +107,32 @@ public class DrawResultantVector : MonoBehaviour
         _previousVector1EndPoint = _vector1EndPoint;
         _previousVector2EndPoint = _vector2EndPoint;
         _previousSelectedOperation = _selectedOperation;
+    }
+
+    // UI Methods
+    public void HandleDropdownInputData(int value) {
+        switch (value) {
+            case 0: 
+                _selectedOperation = Operation.Addition;
+                break;
+            case 1:
+                _selectedOperation = Operation.Subtraction; 
+                break;
+            case 2:
+                _selectedOperation = Operation.CrossProduct; 
+                break;
+        }
+    }
+
+    public void HandleToggle(bool toggle) {
+        _reverseOperands = toggle;
+    }
+
+    public void HandleUIText() {
+        _vectorMagnitudeAdditionText.text = (!_reverseOperands ? "|V1| + |V2|" : "|V2| + |V1|") + ": " + _vectorMagnitudeAddition;
+        _vectorAdditionText.text = (!_reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + _vectorAddition;
+        _vectorSubtractionText.text = (!_reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + _vectorSubtraction;
+        _vectorCrossProductText.text = (!_reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + _vectorCrossProduct;
+        _vectorDotProductText.text = (!_reverseOperands ? "V1 . V2" : "V2 . V1") + ": " + _vectorDotProduct;
     }
 }
