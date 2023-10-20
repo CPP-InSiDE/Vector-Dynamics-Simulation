@@ -4664,10 +4664,10 @@ RectTransform:
   m_Father: {fileID: 1735635550}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1780, y: 931}
-  m_SizeDelta: {x: 269.214, y: 110.4518}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -140, y: -149}
+  m_SizeDelta: {x: 269.21387, y: 110.45178}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &516631921
 MonoBehaviour:
@@ -5054,7 +5054,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 545040897}
-  - component: {fileID: 545040898}
   m_Layer: 0
   m_Name: origin
   m_TagString: Untagged
@@ -5077,25 +5076,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &545040898
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 545040895}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eacf7ff2d3a300847a8a1a6dc39da18e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _xAxis: {fileID: 837137283}
-  _yAxis: {fileID: 1841321520}
-  _zAxis: {fileID: 158872997}
-  _vector1: {fileID: 2084862427}
-  _vector2: {fileID: 1008639426}
-  _resultantVector: {fileID: 403343203}
-  _scaleUnit: 4
 --- !u!1 &555005085
 GameObject:
   m_ObjectHideFlags: 0

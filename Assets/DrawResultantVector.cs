@@ -55,7 +55,7 @@ public class DrawResultantVector : MonoBehaviour
         ReverseVectorEndPoints();
         if (IsStateUnChanged()) return;
         PerformVectorArithmetic();
-        ClearLog();
+        // ClearLog();
         PrintVectorArithmetic();
         _arrow._EndPoint = CalculateResultantVectorEndPoint();
         HandleDotProductCalculationsUIText();
@@ -89,12 +89,12 @@ public class DrawResultantVector : MonoBehaviour
         _vectorDotProduct = Vector3.Dot(_vector1EndPoint, _vector2EndPoint);
     }
 
-    public void ClearLog() {
-        Assembly assembly = Assembly.GetAssembly(typeof(UnityEditor.ActiveEditorTracker));
-        System.Type type = assembly.GetType("UnityEditor.LogEntries");
-        MethodInfo method = type.GetMethod("Clear");
-        method.Invoke(new object(), null);
-    }
+    // public void ClearLog() {
+    //     Assembly assembly = Assembly.GetAssembly(typeof(ActiveEditorTracker));
+    //     System.Type type = assembly.GetType("UnityEditor.LogEntries");
+    //     MethodInfo method = type.GetMethod("Clear");
+    //     method.Invoke(new object(), null);
+    // }
 
     void PrintVectorArithmetic() {
         print((!_reverseOperands ? "|V1| + |V2|" : "|V2| + |V1|") + ": " + _vectorMagnitudeAddition);
