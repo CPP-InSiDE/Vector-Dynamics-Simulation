@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -11,29 +12,37 @@ public class DrawResultantVector : MonoBehaviour
     private Vector3 _vector1EndPoint;
     private Vector3 _vector2EndPoint;
     private float _vectorMagnitudeAddition;
+    private float _vectorMagnitudeMultiplication;
+    private float _angleBetweenVectorsInDegrees;
+    private float _cosineOfAngleBetweenVectors;
     private Vector3 _vectorAddition;
     private Vector3 _vectorSubtraction;
     private Vector3 _vectorCrossProduct;
     private float _vectorDotProduct;
-    private enum Operation { Addition, Subtraction, CrossProduct };
+    private enum Operation { Addition, Subtraction, CrossProduct, DotProduct };
     private Operation _previousSelectedOperation;
     private Vector3 _previousVector1EndPoint;
     private Vector3 _previousVector2EndPoint;
+    private bool _previousReverseOperands;
+    private bool _is3DMode = true;
+    private bool _previousIs3DMode = false;
 
     // SERIALIZABLE VARIABLES
     [SerializeField] private DrawArrow _vector1Line;
     [SerializeField] private DrawArrow _vector2Line;
     [SerializeField] private Operation _selectedOperation = Operation.Addition;
     [SerializeField] private bool _reverseOperands = false;
-
-    // [SerializeField] private TMPro.TextMeshProUGUI _vector1CoordinatesText;
-    // [SerializeField] private TMPro.TextMeshProUGUI _vector2CoordinatesText;
-    // [SerializeField] private TMPro.TextMeshProUGUI _resultantVectorCoordinatesText;
+    
     [SerializeField] private TMPro.TextMeshProUGUI _vectorMagnitudeAdditionText;
+    [SerializeField] private TMPro.TextMeshProUGUI _vectorMagnitudeMultiplicationText;
+    [SerializeField] private TMPro.TextMeshProUGUI _angleBetweenVectorsText;
+    [SerializeField] private TMPro.TextMeshProUGUI _cosineOfAngleBetweenVectorsText;
+    [SerializeField] private TMPro.TextMeshProUGUI _vectorDotProductText;
     [SerializeField] private TMPro.TextMeshProUGUI _vectorAdditionText;
     [SerializeField] private TMPro.TextMeshProUGUI _vectorSubtractionText;
     [SerializeField] private TMPro.TextMeshProUGUI _vectorCrossProductText;
-    [SerializeField] private TMPro.TextMeshProUGUI _vectorDotProductText;
+
+    [SerializeField] private GameObject _dotProductPanel;
 
     // LIFECYCLE METHODS
     void Start() {
@@ -41,13 +50,15 @@ public class DrawResultantVector : MonoBehaviour
     }
 
     void Update() {
+        _is3DMode = CameraModeToggle._Instance.IsCamera3D;
+        if(_selectedOperation != Operation.DotProduct) _dotProductPanel.SetActive(false);
         ReverseVectorEndPoints();
         if (IsStateUnChanged()) return;
         PerformVectorArithmetic();
         ClearLog();
         PrintVectorArithmetic();
         _arrow._EndPoint = CalculateResultantVectorEndPoint();
-        // _arrow._ScaledEndPoint = GameManager._Instance.ScaleVector(_arrow._EndPoint);
+        HandleDotProductCalculationsUIText();
         HandleUIText();
         SaveState();
     }
@@ -61,11 +72,17 @@ public class DrawResultantVector : MonoBehaviour
     bool IsStateUnChanged() {
         return _vector1EndPoint == _previousVector1EndPoint
         && _vector2EndPoint == _previousVector2EndPoint
-        && _selectedOperation == _previousSelectedOperation;
+        && _selectedOperation == _previousSelectedOperation
+        && _reverseOperands == _previousReverseOperands
+        && _is3DMode == _previousIs3DMode;
     }
 
     void PerformVectorArithmetic() {
         _vectorMagnitudeAddition = _vector1EndPoint.magnitude + _vector2EndPoint.magnitude;
+        _vectorMagnitudeMultiplication = _vector1EndPoint.magnitude * _vector2EndPoint.magnitude;
+        _angleBetweenVectorsInDegrees = Vector3.Angle(_vector1EndPoint, _vector2EndPoint);
+        float angleBetweenVectorsInRadians = _angleBetweenVectorsInDegrees * (Mathf.PI / 180f);
+        _cosineOfAngleBetweenVectors = Mathf.Cos(angleBetweenVectorsInRadians);
         _vectorAddition = _vector1EndPoint + _vector2EndPoint;
         _vectorSubtraction = _vector1EndPoint - _vector2EndPoint;
         _vectorCrossProduct = Vector3.Cross(_vector1EndPoint, _vector2EndPoint);
@@ -81,14 +98,17 @@ public class DrawResultantVector : MonoBehaviour
 
     void PrintVectorArithmetic() {
         print((!_reverseOperands ? "|V1| + |V2|" : "|V2| + |V1|") + ": " + _vectorMagnitudeAddition);
-        print((!_reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + _vectorAddition);
-        print((!_reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + _vectorSubtraction);
-        print((!_reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + _vectorCrossProduct);
+        print((!_reverseOperands ? "|V1| * |V2|" : "|V2| * |V1|") + ": " + _vectorMagnitudeMultiplication);
+        print((!_reverseOperands ? "Θ (V1, V2)" : "Θ (V2, V1)") + ": " + _angleBetweenVectorsInDegrees);
+        print("Cos (" + _angleBetweenVectorsInDegrees + "): " + _cosineOfAngleBetweenVectors);
         print((!_reverseOperands ? "V1 . V2" : "V2 . V1") + ": " + _vectorDotProduct);
+        print((!_reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + (_is3DMode ? _vectorAddition : (Vector2) _vectorAddition));
+        print((!_reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + (_is3DMode ? _vectorSubtraction : (Vector2) _vectorSubtraction));
+        print((!_reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + (_is3DMode ? _vectorCrossProduct : (Vector2) _vectorCrossProduct));
     }
 
     Vector3 CalculateResultantVectorEndPoint() {
-        Vector3 resultantVectorEndPoint = new Vector3();
+        Vector3 resultantVectorEndPoint = Vector3.zero;
         switch(_selectedOperation) {
             case Operation.Addition:
                 resultantVectorEndPoint = _vectorAddition;
@@ -99,6 +119,8 @@ public class DrawResultantVector : MonoBehaviour
             case Operation.CrossProduct:
                 resultantVectorEndPoint = _vectorCrossProduct;
                 break;
+            case Operation.DotProduct:
+                break;
         }
         return resultantVectorEndPoint;
     }
@@ -107,19 +129,31 @@ public class DrawResultantVector : MonoBehaviour
         _previousVector1EndPoint = _vector1EndPoint;
         _previousVector2EndPoint = _vector2EndPoint;
         _previousSelectedOperation = _selectedOperation;
+        _previousReverseOperands = _reverseOperands;
+        _previousIs3DMode = _is3DMode;
     }
 
     // UI Methods
     public void HandleDropdownInputData(int value) {
+        CameraModeToggle._Instance.EnableToggle();
+        _dotProductPanel.SetActive(false);
         switch (value) {
             case 0: 
                 _selectedOperation = Operation.Addition;
+                _arrow._Label = !_reverseOperands ? "V1 + V2" : "V2 + V1";
                 break;
             case 1:
-                _selectedOperation = Operation.Subtraction; 
+                _selectedOperation = Operation.Subtraction;
+                _arrow._Label = !_reverseOperands ? "V1 - V2" : "V2 - V1";
                 break;
             case 2:
-                _selectedOperation = Operation.CrossProduct; 
+                _selectedOperation = Operation.CrossProduct;
+                _arrow._Label = !_reverseOperands ? "V1 x V2" : "V2 x V1";
+                CameraModeToggle._Instance.Force3DMode();
+                break;
+            case 3:
+                _selectedOperation = Operation.DotProduct;
+                _dotProductPanel.SetActive(true);
                 break;
         }
     }
@@ -128,11 +162,17 @@ public class DrawResultantVector : MonoBehaviour
         _reverseOperands = toggle;
     }
 
+    public void HandleDotProductCalculationsUIText() {
+        _vectorMagnitudeMultiplicationText.text = (!_reverseOperands ? "|V1| * |V2|" : "|V2| * |V1|") + ": " + _vectorMagnitudeMultiplication;
+        _angleBetweenVectorsText.text = (!_reverseOperands ? "Θ (V1, V2)" : "Θ (V2, V1)") + ": " + _angleBetweenVectorsInDegrees;
+        _cosineOfAngleBetweenVectorsText.text = "Cos (" + _angleBetweenVectorsInDegrees + "): " + _cosineOfAngleBetweenVectors;
+        _vectorDotProductText.text = (!_reverseOperands ? "V1 . V2" : "V2 . V1") + ": " + _vectorDotProduct;
+    }
+
     public void HandleUIText() {
         _vectorMagnitudeAdditionText.text = (!_reverseOperands ? "|V1| + |V2|" : "|V2| + |V1|") + ": " + _vectorMagnitudeAddition;
-        _vectorAdditionText.text = (!_reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + _vectorAddition;
-        _vectorSubtractionText.text = (!_reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + _vectorSubtraction;
-        _vectorCrossProductText.text = (!_reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + _vectorCrossProduct;
-        _vectorDotProductText.text = (!_reverseOperands ? "V1 . V2" : "V2 . V1") + ": " + _vectorDotProduct;
+        _vectorAdditionText.text = (!_reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + (_is3DMode ? _vectorAddition : (Vector2) _vectorAddition);
+        _vectorSubtractionText.text = (!_reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + (_is3DMode ? _vectorSubtraction : (Vector2) _vectorSubtraction);
+        _vectorCrossProductText.text = (!_reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + (_is3DMode ? _vectorCrossProduct : (Vector2) _vectorCrossProduct);
     }
 }

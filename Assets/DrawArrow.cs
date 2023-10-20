@@ -10,7 +10,9 @@ public class DrawArrow : MonoBehaviour
     private LineRenderer _arrowHeadRenderer;
     private Vector3 _previousStartPoint;
     private Vector3 _previousEndPoint;
-    private Color _previousColor;
+    private string _previousLabel;
+    private bool _is3DMode = true;
+    private bool _previousIs3DMode = false;
 
     // SERIALIZABLE VARIABLES
     [SerializeField] private Vector3 _startPoint;
@@ -23,7 +25,7 @@ public class DrawArrow : MonoBehaviour
     // ACCESSORS & MUTATORS
     public Vector3 _StartPoint { get; set; }
     public Vector3 _EndPoint { get; set; }
-    public Color _Color { get; set; }
+    public string _Label { get; set; }
 
     // LIFECYCLE METHODS
     void Start() {
@@ -33,10 +35,10 @@ public class DrawArrow : MonoBehaviour
     }
 
     void Update() {
+        _is3DMode = CameraModeToggle._Instance.IsCamera3D;
         if (IsStateUnChanged()) return;
         DrawArrowBody();
         DrawArrowHead();
-        MakeTransparentBasedOnDistance();
         SaveState();
     }
 
@@ -50,8 +52,6 @@ public class DrawArrow : MonoBehaviour
         _arrowBodyRenderer.useWorldSpace = false;
         _arrowBodyRenderer.startWidth = _arrowBodyThickness;
         _arrowBodyRenderer.endWidth = _arrowBodyThickness;
-        _arrowBodyRenderer.startColor = _color;
-        _arrowBodyRenderer.endColor = _color;
     }
 
     void InitializeArrowHead() {
@@ -60,23 +60,24 @@ public class DrawArrow : MonoBehaviour
         _arrowHeadRenderer.material = _arrowBodyRenderer.material;
         _arrowHeadRenderer.startWidth = _arrowHeadThickness;
         _arrowHeadRenderer.endWidth = _arrowBodyThickness;
-        _arrowHeadRenderer.startColor = _color;
-        _arrowHeadRenderer.endColor = _color;
     }
 
     void InitializePublicStateVariables() {
-        _Color = _color;
         _StartPoint = _startPoint;
         _EndPoint = _endPoint;
+        _Label = _label;
     }
 
     bool IsStateUnChanged() {
         return _StartPoint == _previousStartPoint 
-        && _EndPoint == _previousEndPoint 
-        && _Color == _previousColor;
+        && _EndPoint == _previousEndPoint
+        && _Label == _previousLabel
+        && _is3DMode == _previousIs3DMode;
     }
 
     void DrawArrowBody() {
+        _arrowBodyRenderer.startColor = DetermineColorOpacityBasedOnCameraModeAndDistance();
+        _arrowBodyRenderer.endColor = DetermineColorOpacityBasedOnCameraModeAndDistance();
         Vector3[] linePositions = { _StartPoint, _EndPoint };
         _arrowBodyRenderer.positionCount = linePositions.Length;
         _arrowBodyRenderer.SetPositions(linePositions);
@@ -89,21 +90,24 @@ public class DrawArrow : MonoBehaviour
     }
 
     void DrawArrowHead() {
+        _arrowHeadRenderer.startColor = DetermineColorOpacityBasedOnCameraModeAndDistance();
+        _arrowHeadRenderer.endColor = DetermineColorOpacityBasedOnCameraModeAndDistance();
         Vector3 newPoint = GetPointAlongSlopeFromEndPointUsingDistance(-0.25f);
         Vector3[] arrowHeadPositions = { newPoint, _EndPoint };
         _arrowHeadRenderer.positionCount = arrowHeadPositions.Length;
         _arrowHeadRenderer.SetPositions(arrowHeadPositions);
     }
 
-    void MakeTransparentBasedOnDistance() {
-        _Color = Vector3.Distance(_StartPoint, _EndPoint) < 0.1f ? new Color { a = 0 } : _color;
+    Color DetermineColorOpacityBasedOnCameraModeAndDistance() {
+        if ((!_is3DMode && gameObject.name.Equals("z-axis")) || Vector3.Distance(_StartPoint, _EndPoint) < 0.1f) return Color.clear;
+        return _color;
     }
 
     void DrawLabel() {
         Vector3 labelPositionInWorldSpace = GetPointAlongSlopeFromEndPointUsingDistance(0.25f);
         Vector3 labelPositionOnScreen = Camera.main.WorldToScreenPoint(labelPositionInWorldSpace);
-        string labelWithEndPointCoordinates = _label + (gameObject.name.Contains("axis") ? "" : (" " + _EndPoint));
-        Vector2 labelTextSize = GUI.skin.label.CalcSize(new GUIContent(_label));
+        string labelWithEndPointCoordinates = _Label + (gameObject.name.Contains("axis") ? "" : (" " + (_is3DMode ? _EndPoint : (Vector2) _EndPoint)));
+        Vector2 labelTextSize = GUI.skin.label.CalcSize(new GUIContent(_Label));
         Vector2 labelWithEndPointCoordinatesTextSize = GUI.skin.label.CalcSize(new GUIContent(labelWithEndPointCoordinates));
         GUI.Label(
             new Rect(
@@ -115,7 +119,7 @@ public class DrawArrow : MonoBehaviour
             labelWithEndPointCoordinates,
             new GUIStyle {
                 fontSize = 20,
-                normal = new GUIStyleState { textColor = _Color }
+                normal = new GUIStyleState { textColor = DetermineColorOpacityBasedOnCameraModeAndDistance() }
             }
         );
     }
@@ -123,6 +127,6 @@ public class DrawArrow : MonoBehaviour
     void SaveState() {
         _previousStartPoint = _StartPoint;
         _previousEndPoint = _EndPoint;
-        _previousColor = _Color;
+        _previousLabel = _Label;
     }
 }
