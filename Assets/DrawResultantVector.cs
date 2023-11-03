@@ -30,6 +30,7 @@ public class DrawResultantVector : MonoBehaviour
     // SERIALIZABLE VARIABLES
     [SerializeField] private DrawArrow _vector1Line;
     [SerializeField] private DrawArrow _vector2Line;
+    [SerializeField] private DrawArrow _vectorProjectionLine;
     [SerializeField] private Operation _selectedOperation = Operation.Addition;
     [SerializeField] private bool _reverseOperands = false;
     
@@ -56,8 +57,9 @@ public class DrawResultantVector : MonoBehaviour
         if (IsStateUnChanged()) return;
         PerformVectorArithmetic();
         // ClearLog();
-        PrintVectorArithmetic();
+        // PrintVectorArithmetic();
         _arrow._EndPoint = CalculateResultantVectorEndPoint();
+        UpdateProjection();        
         HandleDotProductCalculationsUIText();
         HandleUIText();
         SaveState();
@@ -96,16 +98,16 @@ public class DrawResultantVector : MonoBehaviour
     //     method.Invoke(new object(), null);
     // }
 
-    void PrintVectorArithmetic() {
-        print((!_reverseOperands ? "|V1| + |V2|" : "|V2| + |V1|") + ": " + _vectorMagnitudeAddition);
-        print((!_reverseOperands ? "|V1| * |V2|" : "|V2| * |V1|") + ": " + _vectorMagnitudeMultiplication);
-        print((!_reverseOperands ? "Θ (V1, V2)" : "Θ (V2, V1)") + ": " + _angleBetweenVectorsInDegrees);
-        print("Cos (" + _angleBetweenVectorsInDegrees + "): " + _cosineOfAngleBetweenVectors);
-        print((!_reverseOperands ? "V1 . V2" : "V2 . V1") + ": " + _vectorDotProduct);
-        print((!_reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + (_is3DMode ? _vectorAddition : (Vector2) _vectorAddition));
-        print((!_reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + (_is3DMode ? _vectorSubtraction : (Vector2) _vectorSubtraction));
-        print((!_reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + (_is3DMode ? _vectorCrossProduct : (Vector2) _vectorCrossProduct));
-    }
+    // void PrintVectorArithmetic() {
+    //     print((!_reverseOperands ? "|V1| + |V2|" : "|V2| + |V1|") + ": " + _vectorMagnitudeAddition);
+    //     print((!_reverseOperands ? "|V1| * |V2|" : "|V2| * |V1|") + ": " + _vectorMagnitudeMultiplication);
+    //     print((!_reverseOperands ? "Θ (V1, V2)" : "Θ (V2, V1)") + ": " + _angleBetweenVectorsInDegrees);
+    //     print("Cos (" + _angleBetweenVectorsInDegrees + "): " + _cosineOfAngleBetweenVectors);
+    //     print((!_reverseOperands ? "V1 . V2" : "V2 . V1") + ": " + _vectorDotProduct);
+    //     print((!_reverseOperands ? "V1 + V2" : "V2 + V1") + ": " + (_is3DMode ? _vectorAddition : (Vector2) _vectorAddition));
+    //     print((!_reverseOperands ? "V1 - V2" : "V2 - V1") + ": " + (_is3DMode ? _vectorSubtraction : (Vector2) _vectorSubtraction));
+    //     print((!_reverseOperands ? "V1 x V2" : "V2 x V1") + ": " + (_is3DMode ? _vectorCrossProduct : (Vector2) _vectorCrossProduct));
+    // }
 
     Vector3 CalculateResultantVectorEndPoint() {
         Vector3 resultantVectorEndPoint = Vector3.zero;
@@ -123,6 +125,28 @@ public class DrawResultantVector : MonoBehaviour
                 break;
         }
         return resultantVectorEndPoint;
+    }
+
+    void UpdateProjection() {
+        _vectorProjectionLine._EndPoint = _arrow._EndPoint;
+        switch(_selectedOperation) {
+            case Operation.Addition:
+                _vectorProjectionLine._Color = Color.magenta;
+                _vectorProjectionLine._StartPoint = _vector1Line._EndPoint;
+                break;
+            case Operation.Subtraction:
+                _vectorProjectionLine._StartPoint = !_reverseOperands ? _vector1Line._EndPoint : _vector2Line._EndPoint;
+                _vectorProjectionLine._Color = !_reverseOperands ? Color.magenta : Color.yellow;
+                break;
+            case Operation.CrossProduct:
+                _vectorProjectionLine._StartPoint = Vector3.zero;
+                _vectorProjectionLine._EndPoint = Vector3.zero;
+                break;
+            case Operation.DotProduct:
+                _vectorProjectionLine._StartPoint = Vector3.zero;
+                _vectorProjectionLine._EndPoint = Vector3.zero;
+                break;
+        }
     }
 
     void SaveState() {

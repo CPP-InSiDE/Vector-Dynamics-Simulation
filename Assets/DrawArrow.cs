@@ -11,6 +11,7 @@ public class DrawArrow : MonoBehaviour
     private Vector3 _previousStartPoint;
     private Vector3 _previousEndPoint;
     private string _previousLabel;
+    private Color _previousColor;
     private bool _is3DMode = true;
     private bool _previousIs3DMode = false;
 
@@ -26,6 +27,7 @@ public class DrawArrow : MonoBehaviour
     public Vector3 _StartPoint { get; set; }
     public Vector3 _EndPoint { get; set; }
     public string _Label { get; set; }
+    public Color _Color { get; set; }
 
     // LIFECYCLE METHODS
     void Start() {
@@ -52,6 +54,7 @@ public class DrawArrow : MonoBehaviour
         _arrowBodyRenderer.useWorldSpace = false;
         _arrowBodyRenderer.startWidth = _arrowBodyThickness;
         _arrowBodyRenderer.endWidth = _arrowBodyThickness;
+        _arrowBodyRenderer.material.mainTextureScale = new Vector2(1f / _arrowBodyRenderer.startWidth, 1.0f);
     }
 
     void InitializeArrowHead() {
@@ -65,13 +68,15 @@ public class DrawArrow : MonoBehaviour
     void InitializePublicStateVariables() {
         _StartPoint = _startPoint;
         _EndPoint = _endPoint;
-        _Label = _label;
+        _Label = System.Convert.ToString(_label);
+        _Color = _color;
     }
 
     bool IsStateUnChanged() {
         return _StartPoint == _previousStartPoint 
         && _EndPoint == _previousEndPoint
         && _Label == _previousLabel
+        && _Color == _previousColor
         && _is3DMode == _previousIs3DMode;
     }
 
@@ -100,10 +105,11 @@ public class DrawArrow : MonoBehaviour
 
     Color DetermineColorOpacityBasedOnCameraModeAndDistance() {
         if ((!_is3DMode && gameObject.name.Equals("z-axis")) || Vector3.Distance(_StartPoint, _EndPoint) < 0.1f) return Color.clear;
-        return _color;
+        return _Color;
     }
 
     void DrawLabel() {
+        if (gameObject.name.Contains("projection")) return;
         Vector3 labelPositionInWorldSpace = GetPointAlongSlopeFromEndPointUsingDistance(0.25f);
         Vector3 labelPositionOnScreen = Camera.main.WorldToScreenPoint(labelPositionInWorldSpace);
         string labelWithEndPointCoordinates = _Label + (gameObject.name.Contains("axis") ? "" : (" " + (_is3DMode ? _EndPoint : (Vector2) _EndPoint)));
@@ -128,5 +134,6 @@ public class DrawArrow : MonoBehaviour
         _previousStartPoint = _StartPoint;
         _previousEndPoint = _EndPoint;
         _previousLabel = _Label;
+        _previousColor = _Color;
     }
 }
