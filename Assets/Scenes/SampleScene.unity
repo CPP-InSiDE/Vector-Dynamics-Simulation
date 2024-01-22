@@ -1077,6 +1077,87 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 129975160}
   m_CullTransparentMesh: 1
+--- !u!1001 &146725494
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2800756605378155562, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_text
+      value: Vector Calculation
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894316, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_Name
+      value: ServerManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894317, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: problemName
+      value: vector_calculation
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894317, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: activateObjs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894317, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: activateObjs.Array.data[0]
+      value: 
+      objectReference: {fileID: 837137279}
+    - target: {fileID: 2800756606265894317, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: activateObjs.Array.data[1]
+      value: 
+      objectReference: {fileID: 1841321516}
+    - target: {fileID: 2800756606265894317, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: activateObjs.Array.data[2]
+      value: 
+      objectReference: {fileID: 158872996}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_RootOrder
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2800756606265894318, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b49a0e876bc2d5d438d51a65d695b452, type: 3}
 --- !u!1 &158872996
 GameObject:
   m_ObjectHideFlags: 0
@@ -1094,7 +1175,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &158872997
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6987,7 +7068,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!120 &837137281
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -15634,7 +15715,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!120 &1841321518
 LineRenderer:
   m_ObjectHideFlags: 0
