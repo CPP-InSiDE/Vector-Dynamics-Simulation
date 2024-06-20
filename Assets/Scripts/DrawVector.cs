@@ -7,14 +7,12 @@ public class DrawVector : MonoBehaviour
 {
     // PRIVATE VARIABLES
     private DrawArrow _arrow;
-    private float _previousAngleInDegrees;
-    private float _previousMagnitude;
+    private Vector3 _previousVector;
 
     public enum Direction { Positive, Negative };
-    
+
     // SERIALIZABLE VARIABLES
-    [SerializeField] private float _angleInDegrees;
-    [SerializeField] private float _magnitude;
+    [SerializeField] private Vector3 _vector;
 
     // LIFECYCLE METHODS
     void Start() {
@@ -29,29 +27,31 @@ public class DrawVector : MonoBehaviour
 
     // CLASS METHODS
     bool IsStateUnChanged() {
-        return _angleInDegrees == _previousAngleInDegrees
-        && _magnitude == _previousMagnitude;
+        return _vector == _previousVector;
     }
 
     Vector3 CalculateVectorEndPoint() {
-        float angleInRadians = _angleInDegrees * (Mathf.PI / 180f);
-        Vector3 vectorEndPoint = new Vector3 {
-            x = _magnitude * Mathf.Cos(angleInRadians),
-            y = _magnitude * Mathf.Sin(angleInRadians)
-        };
+        Vector3 vectorEndPoint = _vector;
         return vectorEndPoint;
     }
 
     void SaveState() {
-        _previousAngleInDegrees = _angleInDegrees;
-        _previousMagnitude = _magnitude;
+        _previousVector = _vector;
     }
 
-    public void GrabFromAngleInputField(string angle) {
-        _angleInDegrees = float.Parse(angle);
+    public void GrabXFromInputField(string value)
+    {
+        float num = value == "" ? 0 : float.Parse(value);
+        _vector = new Vector3(num, _vector.y, _vector.z);
     }
-
-    public void GrabFromMagnitudeInputField(string magnitude) {
-        _magnitude = Mathf.Clamp(float.Parse(magnitude), -6f, 6f);
+    public void GrabYFromInputField(string value)
+    {
+        float num = value == "" ? 0 : float.Parse(value);
+        _vector = new Vector3(_vector.x, num, _vector.z);
+    }
+    public void GrabZFromInputField(string value)
+    {
+        float num = value == "" ? 0 : float.Parse(value);
+        _vector = new Vector3(_vector.x, _vector.y, num);
     }
 }
